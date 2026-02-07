@@ -10,6 +10,7 @@ build/
 
 # 出力ファイル
 output/
+alerts/
 
 # IDE
 .vscode/
