@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.release.tdnet.info)",
+      "WebFetch(domain:www.jpx.co.jp)",
+      "WebFetch(domain:apidoc-tdneten.jpx-dataservice.com)",
+      "Bash(git init:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(uv add:*)",
+      "Bash(uv run python:*)",
+      "Bash(uv init:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv pip:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(touch:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx:*)",
+      "Bash(git --version:*)",
+      "Bash(uv:*)"
+    ]
+  }
+}
