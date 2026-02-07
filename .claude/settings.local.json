@@ -37,7 +37,12 @@
       "Bash(npx:*)",
       "Bash(git --version:*)",
       "Bash(uv:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(git -C \"c:\\\\project\\\\home\\\\tdnet-scraper\" status -u)",
+      "Bash(git -C \"c:\\\\project\\\\home\\\\tdnet-scraper\" diff)",
+      "Bash(git -C \"c:\\\\project\\\\home\\\\tdnet-scraper\" log --oneline -5)",
+      "Bash(git -C \"c:\\\\project\\\\home\\\\tdnet-scraper\" add *)",
+      "Bash(git -C \"c:\\\\project\\\\home\\\\tdnet-scraper\" commit -m \"*\")"
     ]
   }
 }
