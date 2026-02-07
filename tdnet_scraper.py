@@ -41,6 +41,11 @@ def parse_date(date_str: str) -> str:
     return cleaned
 
 
+def format_date(date_str: str) -> str:
+    """YYYYMMDD形式の日付をYYYY/MM/DD形式に変換する。"""
+    return f"{date_str[:4]}/{date_str[4:6]}/{date_str[6:8]}"
+
+
 def fetch_page(url: str) -> requests.Response:
     """URLからHTMLを取得する。リトライ付き。"""
     for attempt in range(MAX_RETRIES):
@@ -78,57 +83,47 @@ def is_no_data(soup: BeautifulSoup) -> bool:
     return "に開示された情報はありません" in text
 
 
+def _cell_text(row, class_name: str) -> str:
+    """行からセルを探してテキストを返す。見つからなければ空文字列。"""
+    cell = row.find("td", class_=class_name)
+    return cell.get_text(strip=True) if cell else ""
+
+
+def _cell_link(row, class_name: str) -> str:
+    """行からセルを探してリンクURLを返す。見つからなければ空文字列。"""
+    cell = row.find("td", class_=class_name)
+    if not cell:
+        return ""
+    a_tag = cell.find("a")
+    if a_tag and a_tag.get("href"):
+        return BASE_URL + a_tag["href"]
+    return ""
+
+
 def parse_rows(soup: BeautifulSoup, date_str: str) -> list[dict]:
     """HTMLテーブルからデータ行をパースする。"""
     table = soup.find("table", id="main-list-table")
     if not table:
         return []
 
+    date_formatted = format_date(date_str)
     records = []
-    rows = table.find_all("tr", recursive=False)
 
-    for row in rows:
-        time_cell = row.find("td", class_="kjTime")
-        if not time_cell:
+    for row in table.find_all("tr", recursive=False):
+        time_text = _cell_text(row, "kjTime")
+        if not time_text:
             continue
 
-        code_cell = row.find("td", class_="kjCode")
-        name_cell = row.find("td", class_="kjName")
-        title_cell = row.find("td", class_="kjTitle")
-        xbrl_cell = row.find("td", class_="kjXbrl")
-        place_cell = row.find("td", class_="kjPlace")
-        history_cell = row.find("td", class_="kjHistroy")  # typo in original HTML
-
-        # 表題のPDFリンク
-        pdf_url = ""
-        if title_cell:
-            a_tag = title_cell.find("a")
-            if a_tag and a_tag.get("href"):
-                pdf_url = BASE_URL + a_tag["href"]
-
-        # XBRLリンク
-        xbrl_url = ""
-        if xbrl_cell:
-            a_tag = xbrl_cell.find("a")
-            if a_tag and a_tag.get("href"):
-                xbrl_url = BASE_URL + a_tag["href"]
-
-        # 日時を組み立て
-        time_text = time_cell.get_text(strip=True)
-        date_formatted = f"{date_str[:4]}/{date_str[4:6]}/{date_str[6:8]}"
-        datetime_str = f"{date_formatted} {time_text}"
-
-        record = {
-            "日時": datetime_str,
-            "コード": code_cell.get_text(strip=True) if code_cell else "",
-            "会社名": name_cell.get_text(strip=True) if name_cell else "",
-            "表題": title_cell.get_text(strip=True) if title_cell else "",
-            "PDF_URL": pdf_url,
-            "XBRL_URL": xbrl_url,
-            "上場取引所": place_cell.get_text(strip=True) if place_cell else "",
-            "更新履歴": history_cell.get_text(strip=True) if history_cell else "",
-        }
-        records.append(record)
+        records.append({
+            "日時": f"{date_formatted} {time_text}",
+            "コード": _cell_text(row, "kjCode"),
+            "会社名": _cell_text(row, "kjName"),
+            "表題": _cell_text(row, "kjTitle"),
+            "PDF_URL": _cell_link(row, "kjTitle"),
+            "XBRL_URL": _cell_link(row, "kjXbrl"),
+            "上場取引所": _cell_text(row, "kjPlace"),
+            "更新履歴": _cell_text(row, "kjHistroy"),  # typo in original HTML
+        })
 
     return records
 
@@ -163,7 +158,7 @@ def main():
     date_str = parse_date(args.date)
     output_dir = Path(args.output)
 
-    print(f"日付: {date_str[:4]}/{date_str[4:6]}/{date_str[6:8]}")
+    print(f"日付: {format_date(date_str)}")
 
     # 1ページ目を取得
     first_url = LIST_URL_TEMPLATE.format(page=1, date=date_str)
