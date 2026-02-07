@@ -22,3 +22,4 @@ nul
 
 # uv
 uv.lock
+.claude/settings.local.json
